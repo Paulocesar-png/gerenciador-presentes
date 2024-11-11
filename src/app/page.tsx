@@ -6,7 +6,7 @@ interface Presente {
   id: number;
   nome_presente: string;
   disponivel: boolean;
-  nome_pessoa?: string | null;
+  nome_pessoa: string | null;
 }
 
 export default function Home() {
@@ -16,9 +16,17 @@ export default function Home() {
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    fetch('/api/presentes')
-      .then((res) => res.json())
-      .then((data: Presente[]) => setPresentes(data));
+    const fetchPresentes = async () => {
+      try {
+        const response = await fetch('/api/presentes');
+        const data = await response.json();
+        setPresentes(data);
+      } catch (error) {
+        console.error("Erro ao buscar presentes:", error);
+      }
+    };
+
+    fetchPresentes();
   }, []);
 
   const handleSubmit = async () => {
@@ -51,6 +59,13 @@ export default function Home() {
           onChange={(e) => setNomePessoa(e.target.value)}
           style={styles.input}
         />
+
+        {/* Legenda das Cores */}
+        <div style={styles.legend}>
+          <span style={styles.available}>Disponível</span> - Verde
+          <span style={styles.reserved}>Reservado</span> - Vermelho
+        </div>
+
         <div style={styles.giftContainer}>
           {presentes.map((presente) => (
             <div key={presente.id} style={styles.giftItem}>
@@ -62,8 +77,14 @@ export default function Home() {
                 disabled={!presente.disponivel}
                 onChange={() => setSelectedPresente(presente.id)}
               />
-              <label htmlFor={`presente-${presente.id}`} style={styles.label}>
-                {presente.nome_presente} {presente.disponivel ? '' : `(Reservado por ${presente.nome_pessoa})`}
+              <label
+                htmlFor={`presente-${presente.id}`}
+                style={{
+                  ...styles.label,
+                  color: presente.disponivel ? 'green' : 'red', // Disponível em verde, reservado em vermelho
+                }}
+              >
+                {presente.nome_presente}
               </label>
             </div>
           ))}
@@ -91,6 +112,7 @@ const styles = {
     alignItems: 'center' as const,
     height: '100vh',
     backgroundColor: '#f7f7f7',
+    padding: '20px',
   },
   container: {
     textAlign: 'center' as const,
@@ -98,7 +120,7 @@ const styles = {
     borderRadius: '8px',
     backgroundColor: '#ffffff',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-    maxWidth: '400px',
+    maxWidth: '600px',
     width: '100%',
   },
   heading: {
@@ -114,21 +136,40 @@ const styles = {
     border: '1px solid #ddd',
     marginBottom: '15px',
   },
-  giftContainer: {
+  legend: {
     display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'start' as const,
+    justifyContent: 'center',
+    gap: '10px',
+    fontSize: '14px',
+    marginBottom: '10px',
+  },
+  available: {
+    color: 'green',
+    fontWeight: 'bold',
+  },
+  reserved: {
+    color: 'red',
+    fontWeight: 'bold',
+  },
+  giftContainer: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: '35px',
+    maxHeight: '300px',
+    overflowY: 'auto' as const,
+    padding: '10px',
+    backgroundColor: '#fafafa',
+    borderRadius: '8px',
+    border: '1px solid #ddd',
     marginBottom: '20px',
   },
   giftItem: {
-    marginBottom: '10px',
     display: 'flex',
-    alignItems: 'center' as const,
+    alignItems: 'center',
+    whiteSpace: 'nowrap',
   },
   label: {
-    fontSize: '16px',
-    color: '#555555',
-    cursor: 'pointer',
+    fontSize: '14px',
     marginLeft: '5px',
   },
   button: {
@@ -141,5 +182,4 @@ const styles = {
     cursor: 'pointer',
     transition: 'background-color 0.3s',
   },
-} as const;
-
+};
