@@ -87,13 +87,13 @@ export default function Home() {
 const styles = {
   pageContainer: {
     display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
     height: '100vh',
     backgroundColor: '#f7f7f7',
   },
   container: {
-    textAlign: 'center' as 'center',
+    textAlign: 'center' as const,
     padding: '20px 30px',
     borderRadius: '8px',
     backgroundColor: '#ffffff',
@@ -116,14 +116,14 @@ const styles = {
   },
   giftContainer: {
     display: 'flex',
-    flexDirection: 'column' as 'column',
-    alignItems: 'start' as 'start',
+    flexDirection: 'column' as const,
+    alignItems: 'start' as const,
     marginBottom: '20px',
   },
   giftItem: {
     marginBottom: '10px',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'center' as const,
   },
   label: {
     fontSize: '16px',
@@ -141,4 +141,5 @@ const styles = {
     cursor: 'pointer',
     transition: 'background-color 0.3s',
   },
-};
+} as const;
+
