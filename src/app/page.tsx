@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 
 interface Presente {
@@ -39,57 +41,65 @@ export default function Home() {
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>Selecione um Presente Disponível</h1>
-      <input
-        type="text"
-        placeholder="Digite seu nome"
-        value={nomePessoa}
-        onChange={(e) => setNomePessoa(e.target.value)}
-        style={styles.input}
-      />
-      <div style={styles.giftContainer}>
-        {presentes.map((presente) => (
-          <div key={presente.id} style={styles.giftItem}>
-            <input
-              type="radio"
-              id={`presente-${presente.id}`}
-              name="presente"
-              value={presente.id}
-              disabled={!presente.disponivel}
-              onChange={() => setSelectedPresente(presente.id)}
-            />
-            <label htmlFor={`presente-${presente.id}`} style={styles.label}>
-              {presente.nome_presente} {presente.disponivel ? '' : `(Reservado por ${presente.nome_pessoa})`}
-            </label>
-          </div>
-        ))}
+    <div style={styles.pageContainer}>
+      <div style={styles.container}>
+        <h1 style={styles.heading}>Selecione um Presente Disponível</h1>
+        <input
+          type="text"
+          placeholder="Digite seu nome"
+          value={nomePessoa}
+          onChange={(e) => setNomePessoa(e.target.value)}
+          style={styles.input}
+        />
+        <div style={styles.giftContainer}>
+          {presentes.map((presente) => (
+            <div key={presente.id} style={styles.giftItem}>
+              <input
+                type="radio"
+                id={`presente-${presente.id}`}
+                name="presente"
+                value={presente.id}
+                disabled={!presente.disponivel}
+                onChange={() => setSelectedPresente(presente.id)}
+              />
+              <label htmlFor={`presente-${presente.id}`} style={styles.label}>
+                {presente.nome_presente} {presente.disponivel ? '' : `(Reservado por ${presente.nome_pessoa})`}
+              </label>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={handleSubmit}
+          style={{
+            ...styles.button,
+            backgroundColor: isHovered ? '#45a049' : styles.button.backgroundColor,
+          }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          Confirmar Seleção
+        </button>
       </div>
-      <button
-        onClick={handleSubmit}
-        style={{
-          ...styles.button,
-          backgroundColor: isHovered ? '#45a049' : styles.button.backgroundColor,
-        }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        Confirmar Seleção
-      </button>
     </div>
   );
 }
 
 const styles = {
+  pageContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    backgroundColor: '#f7f7f7',
+  },
   container: {
     textAlign: 'center' as 'center',
-    marginTop: '50px',
     padding: '20px 30px',
     borderRadius: '8px',
     backgroundColor: '#ffffff',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
     maxWidth: '400px',
-    margin: 'auto',
+    width: '100%',
   },
   heading: {
     color: '#333333',
