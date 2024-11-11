@@ -11,9 +11,11 @@ interface Presente {
 
 export default function Home() {
   const [presentes, setPresentes] = useState<Presente[]>([]);
+  const [filteredPresentes, setFilteredPresentes] = useState<Presente[]>([]);
   const [selectedPresente, setSelectedPresente] = useState<number | null>(null);
   const [nomePessoa, setNomePessoa] = useState<string>('');
   const [isHovered, setIsHovered] = useState(false);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const fetchPresentes = async () => {
@@ -21,6 +23,7 @@ export default function Home() {
         const response = await fetch('/api/presentes');
         const data = await response.json();
         setPresentes(data);
+        setFilteredPresentes(data);
       } catch (error) {
         console.error("Erro ao buscar presentes:", error);
       }
@@ -28,6 +31,15 @@ export default function Home() {
 
     fetchPresentes();
   }, []);
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+
+    const filtered = presentes.filter((presente) =>
+      presente.nome_presente.toLowerCase().includes(term.toLowerCase())
+    );
+    setFilteredPresentes(filtered);
+  };
 
   const handleSubmit = async () => {
     if (!selectedPresente || !nomePessoa) {
@@ -45,20 +57,35 @@ export default function Home() {
 
     fetch('/api/presentes')
       .then((res) => res.json())
-      .then((data: Presente[]) => setPresentes(data));
+      .then((data: Presente[]) => {
+        setPresentes(data);
+        setFilteredPresentes(data);
+      });
   };
 
   return (
     <div style={styles.pageContainer}>
       <div style={styles.container}>
         <h1 style={styles.heading}>Selecione um Presente Disponível</h1>
-        <input
-          type="text"
-          placeholder="Digite seu nome"
-          value={nomePessoa}
-          onChange={(e) => setNomePessoa(e.target.value)}
-          style={styles.input}
-        />
+
+        {/* Campo de nome e busca agrupados */}
+        <div style={styles.inputContainer}>
+          <input
+            type="text"
+            placeholder="Digite seu nome"
+            value={nomePessoa}
+            onChange={(e) => setNomePessoa(e.target.value)}
+            style={styles.input}
+          />
+          <input
+            type="text"
+            placeholder="Buscar presente... (opcional)"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            style={styles.searchInput}
+          />
+          <p style={styles.helpText}>Use a busca para encontrar um presente específico (opcional)</p>
+        </div>
 
         {/* Legenda das Cores */}
         <div style={styles.legend}>
@@ -67,7 +94,7 @@ export default function Home() {
         </div>
 
         <div style={styles.giftContainer}>
-          {presentes.map((presente) => (
+          {filteredPresentes.map((presente) => (
             <div key={presente.id} style={styles.giftItem}>
               <input
                 type="radio"
@@ -81,7 +108,7 @@ export default function Home() {
                 htmlFor={`presente-${presente.id}`}
                 style={{
                   ...styles.label,
-                  color: presente.disponivel ? 'green' : 'red', // Disponível em verde, reservado em vermelho
+                  color: presente.disponivel ? 'green' : 'red',
                 }}
               >
                 {presente.nome_presente}
@@ -128,13 +155,31 @@ const styles = {
     fontSize: '20px',
     marginBottom: '20px',
   },
+  inputContainer: {
+    padding: '10px',
+    borderRadius: '8px',
+    backgroundColor: '#fafafa',
+    marginBottom: '15px',
+  },
   input: {
     width: '100%',
     padding: '8px',
     fontSize: '16px',
     borderRadius: '4px',
     border: '1px solid #ddd',
-    marginBottom: '15px',
+    marginBottom: '10px',
+  },
+  searchInput: {
+    width: '100%',
+    padding: '8px',
+    fontSize: '16px',
+    borderRadius: '4px',
+    border: '1px solid #ddd',
+  },
+  helpText: {
+    fontSize: '12px',
+    color: '#666',
+    marginTop: '5px',
   },
   legend: {
     display: 'flex',
